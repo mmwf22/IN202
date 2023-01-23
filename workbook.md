@@ -48,8 +48,7 @@ If the user is not in the sudo group on remote-server input the following
 
 un-comment PasswordAuthentication and set it no "no"
 
-![screenshot from vim](password_auth.PNG)
-
+![screenshot from vim](pics/password_auth.PNG)
 
 ## 4 restart ssh service
 
