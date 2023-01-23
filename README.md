@@ -50,7 +50,7 @@ If the user is not in the sudo group on remote-server input the following
 
 >sudo vim /etc/ssh/sshd_config
 
-un-comment PasswordAuthentication and set it no "no"
+un-comment PasswordAuthentication and set it to "no"
 
 ![screenshot from vim](pics/password_auth.PNG)
 
