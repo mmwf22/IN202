@@ -75,3 +75,21 @@ user@192.168.22.139: Permission denied (publickey).
 </pre>
 
 not able to connect, pubkeyAuthentication is working
+
+
+
+Disks and Partitions
+=====================
+
+## 1. Create 2 seperate 5GB virtual drives
+
+In Hyper-V-Manager --> new --> Harddisk
+- VHDX
+- fixed size
+- named so I know whats the use for them (www_ubnt and app_ubnt)
+
+## 2. Mount disk, partition, add LVM, create filesystem
+
+## 3. Add new disk to /etc/fstab
+
+## 4. Re-mount and test
