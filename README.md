@@ -1,4 +1,4 @@
-Workbook IN202
+**Workbook IN202**
 ==================
 
 
@@ -13,7 +13,7 @@ SSH Authentication config
 >-e = export, reformat  
 >-f, = filename/location  
 >-c, = comment  
->-b = bits, key size  
+>-b = bits, key size 
 >-p = change passphrase(-N, new;-P, old)  
 >-i, = input  
 >-q, = silent ssh  
@@ -81,14 +81,79 @@ not able to connect, pubkeyAuthentication is working
 Disks and Partitions
 =====================
 
+## A. Number, size, fstype and UUID of disks and partitions
+
+
+**input**
+
+
+>sudo lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,TYPE,UUID
+
+**alternative**
+>sudo fdisk -l
+
+**only UUID**
+>sudo blkid | grep UUID=
+
+*with grep, sort and pipes its possible to get the needed values quickly*
+<>
+**output**
+<!-- <pre> -->
+
+
+```
+NAME                      FSTYPE       SIZE MOUNTPOINT        TYPE UUID
+loop3                     squashfs    49.8M /snap/snapd/17950 loop
+sda                                     30G                   disk
+├─sda1                    vfat           1G /boot/efi         part E6CD-9A9A
+├─sda2                    ext4           2G /boot             part f7bb03fe-caff-4a5a-ae2c-cfb68e41d50c
+└─sda3                    LVM2_member 26.9G                   part riEBMK-fIxx-Noup-V4kU-t5H8-mVIF-yyBQX0
+  └─ubuntu--vg-ubuntu--lv ext4        13.5G /                 lvm  accbbe4e-bf45-433b-8803-e291e01788db
+sdb                                     20G                   disk
+└─sdb1                    LVM2_member   20G                   part mKFq8i-TIcd-KV9G-7PKG-P0Kq-j1bG-SINesf
+  └─vg_hftm-lv_hftm       ext4          20G /opt/hftm         lvm  f740664a-b89a-4d08-a83e-be4e0526e329
+sdc                                      5G                   disk
+└─sdc1                    LVM2_member    5G                   part JZrU7K-E0g1-fv24-I3zO-fp3P-N9lu-YOTrb2
+  └─vg_app-lv_app         ext4           5G /opt/app          lvm  f663b9c2-ed67-4f80-9389-a5eb683d53d4
+sdd                                      5G                   disk
+└─sdd1                    LVM2_member    5G                   part RAIn0z-AvVR-PEAF-Gi6T-I47K-UEfE-JdiaA6
+  └─vg_www-lv_www         ext4           5G /var/www          lvm  e16a5cc7-e377-498f-a0a5-c5e1f6eef4a8
+sr0                                   1024M                   rom
+```
+
 ## 1. Create 2 seperate 5GB virtual drives
 
 In Hyper-V-Manager --> new --> Harddisk
 - VHDX
 - fixed size
-- named so I know whats the use for them (www_ubnt and app_ubnt)
+- named so I know what's the use for them (www_ubnt and app_ubnt)
 
-## 2. Mount disk, partition, add LVM, create filesystem
+For maintaining overview of virtual disks and their names on the server, I did the following steps first only with one virtual disk connected to the vm. Only then I connected the second and repeated the steps for it.
+
+## 2.1 partition the drive with fdisk
+
+first list drives and check for the correct disk then use:
+
+**input**
+
+```
+fdisk /dev/sdc
+```
+
+1. n --> creates new partition
+2. p --> primary
+3. partition number: default
+4. first sector: default
+5. last sector: default (max. size)
+6. t --> type of partition
+7. for LVM --> 8e (L to list all codes)
+8. w --> write changes
+
+*check if lvm2 is installed!*
+
+## 2.2add LVM, create filesystem
+
+
 
 ## 3. Add new disk to /etc/fstab
 
