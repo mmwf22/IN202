@@ -128,17 +128,13 @@ In Hyper-V-Manager --> new --> Harddisk
 - fixed size
 - named so I know what's the use for them (www_ubnt and app_ubnt)
 
-For maintaining overview of virtual disks and their names on the server, I did the following steps first only with one virtual disk connected to the vm. Only then I connected the second and repeated the steps for it.
+For maintaining overview of virtual disks and their names on the server, I did the following steps first only with one virtual disk connected to the vm. Only then I connected the second and repeated the steps for it. *(Only in part 2.1)*
 
 ## 2.1 partition the drive with fdisk
 
 first list drives and check for the correct disk then use:
 
-**input**
-
-```
-fdisk /dev/sdc
-```
+>fdisk /dev/sdc  
 
 1. n --> creates new partition
 2. p --> primary
@@ -151,7 +147,67 @@ fdisk /dev/sdc
 
 *check if lvm2 is installed!*
 
-## 2.2add LVM, create filesystem
+## 2.2 add LVM, create filesystem
+
+**1.** create physical volume
+
+>sudo pvcreate /dev/sdc1  
+>sudo pvcreate /dev/sdd1  
+
+**2.** create volume groups on pv
+
+>sudo vgcreate vg_app /dev/sdc1  
+>sudo vgcreate vg_www /dev/sdd1  
+
+**3.** create logical volumes
+
+>sudo lvcreate -l 100%FREE -n lv_app vg_app    
+>sudo lvcreate -l 100%FREE -n lv_www vg_www    
+
+**4.** create filesystem
+
+>sudo mkfs.ext4 /dev/vg_app/lv_app  
+>sudo mkfs.ext4 /dev/vg_www/lv_www  
+
+## 2.3 mount disk permanently
+
+**1.** create mount points
+
+>sudo mkdir /opt/app  
+>sudo mkdir /var/www
+
+**2.** add the disks to /etc/fstab
+
+*a) preparation*
+ - for lv_app copy /dev/mapper path to notepad  
+ - for lv_www copy UUID to notepad
+
+*b) map the filestystems with the mountpoints*
+>sudo vim /etc/fstab
+
+syntax of fstab
+```
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+```
+
+*input*
+```
+/dev/mapper/vg_app-lv_app /opt/app ext4 defaults        0 0  
+UUID="e16a5cc7-e377-498f-a0a5-c5e1f6eef4a8" /var/www ext4 defaults 0 0  
+```
+
+![Alt text](pics/fstab.PNG)
+
+*c) unmount all disks then remount all, then check if the disks added*  
+*to fstab got mounted*
+
+```
+sudo umount -a
+sudo mount -a
+sudo mount -l
+```
+
+
 
 
 
