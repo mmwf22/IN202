@@ -1,7 +1,6 @@
 **Workbook IN202**
 ==================
 
-
 SSH Authentication config
 ===========================
 
@@ -206,11 +205,3 @@ sudo umount -a
 sudo mount -a
 sudo mount -l
 ```
-
-
-
-
-
-## 3. Add new disk to /etc/fstab
-
-## 4. Re-mount and test
