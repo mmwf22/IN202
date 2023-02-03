@@ -9,13 +9,13 @@ SSH Authentication config
  ### Flags:
 
 >-t = type, select algorithm  
->-e = export, reformat  
->-f, = filename/location  
->-c, = comment  
->-b = bits, key size 
->-p = change passphrase(-N, new;-P, old)  
->-i, = input  
->-q, = silent ssh  
+-e = export, reformat  
+-f, = filename/location  
+-c, = comment  
+-b = bits, key size 
+-p = change passphrase(-N, new;-P, old)  
+-i, = input  
+-q, = silent ssh  
 
 ### input
 
@@ -151,29 +151,29 @@ first list drives and check for the correct disk then use:
 **1.** create physical volume
 
 >sudo pvcreate /dev/sdc1  
->sudo pvcreate /dev/sdd1  
+sudo pvcreate /dev/sdd1  
 
 **2.** create volume groups on pv
 
 >sudo vgcreate vg_app /dev/sdc1  
->sudo vgcreate vg_www /dev/sdd1  
+sudo vgcreate vg_www /dev/sdd1  
 
 **3.** create logical volumes
 
 >sudo lvcreate -l 100%FREE -n lv_app vg_app    
->sudo lvcreate -l 100%FREE -n lv_www vg_www    
+sudo lvcreate -l 100%FREE -n lv_www vg_www    
 
 **4.** create filesystem
 
 >sudo mkfs.ext4 /dev/vg_app/lv_app  
->sudo mkfs.ext4 /dev/vg_www/lv_www  
+sudo mkfs.ext4 /dev/vg_www/lv_www  
 
 ## 2.3 mount disk permanently
 
 **1.** create mount points
 
 >sudo mkdir /opt/app  
->sudo mkdir /var/www
+sudo mkdir /var/www
 
 **2.** add the disks to /etc/fstab
 
@@ -205,3 +205,182 @@ sudo umount -a
 sudo mount -a
 sudo mount -l
 ```
+LEMP
+====
+
+I chose the LEMP stack as it uses Nginx and not Apache, i don't plan to host multiple sites so I don't need Apache and with Nginx i got a webserver that is more efficient than Apache in handling requests.
+
+## **1. setup**
+
+**A.) install Nginx**
+
+>sudo apt install nginx
+
+**A.1) add Nginx HTTP to ufw**
+
+>sudo ufw allow 'Nginx HTTP'
+
+*check status*
+
+>sudo ufw status
+
+next I created a folder for my domain
+
+>sudo mkdir /var/www/malik_hftm
+
+and then I gave the console user ownership of the directory
+>sudo chown -R $USER:$USER /var/www/malik_hftm
+
+now I need to create a config. file for my domain.  
+php processor already included
+
+>sudo vim /etc/nginx/sites-available/malik_hftm
+
+```
+server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/malik_hftm/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name malik.hftm www.malik.hftm;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}
+```
+
+![Siteconfig](pics/nginx_siteconfig.PNG)
+
+now I activated the config by linking it to /etc/nginx/sites-enabled/
+>sudo ln -s /etc/nginx/sites-available/malik_hftm /etc/nginx/sites-enabled/
+
+reload Nginx
+
+>sudo systemctl reload nginx
+
+**B.) install MySQL**
+
+>sudo apt install mysql-server
+
+now I want to make the MySQL installation secure by runing the "mysql_secure_installation" script.
+The script is included in the installation of MySQL-Server.
+
+But before I use the script I need to change the MySQL auth. method and the SQL root password.
+This is needed as the script will produce an error if this change is not done before.
+
+After the script is done, I will need change the auth. method back to "auth_socket"
+
+**B.1) change MySQL auth. method and run secure_installation script**
+
+1. >sudo mysql
+   
+2. >ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '**YOUR_PASSWORD**';
+   
+3. exit MySQL console
+   
+4. >sudo mysql_secure_installation
+  - script will ask to enable VALIDATE PASSWORD PLUGIN
+  only enable if explicitly needed
+  - everything else can be passed with "y"
+
+1. back to MySQL console to change auth. method
+   >sudo mysql -u root -p
+
+2. >ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
+
+**C.) install PHP fastCGI process manager (fpm)**
+
+1. >sudo apt install php8.1-fpm php-mysql
+
+## 2. testing
+
+
+**php**
+
+for testing I created the following .php file in /var/www/malik_hftm/html
+
+- info.php
+
+```
+<?php
+phpinfo();
+```
+
+by going to http://malik.hftm/info.php I can verify that the php processor is working correctly if the .php file is shown correctly
+
+**MySQL**
+
+the test of MySQL needs an example user and an example database
+
+1. login to mysql
+2.  >CREATE DATABASE example_database;
+3.  >CREATE USER 'example_user'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
+4.  >GRANT ALL ON example_database.* TO 'example_user'@'%';
+5.  exit mysql console
+
+now I logged in with the example user to put a table and some data in the database
+
+1. >mysql -u example_user -p
+2. create table
+  ```
+    CREATE TABLE example_database.todo_list (
+    item_id INT AUTO_INCREMENT,
+    content VARCHAR(255),
+    PRIMARY KEY(item_id)
+    );
+  ```
+3. insert data into table
+  >INSERT INTO example_database.todo_list (content) VALUES ("My first important item");
+
+  with the follwoing command its possible to check the created table
+
+  >SELECT * FROM example_database.todo_list;
+
+4. create .php script to access MySQL database
+>sudo vim /var/www/malik_hftm//html/todo_list.php
+
+```
+<?php
+$user = "example_user";
+$password = "password";
+$database = "example_database";
+$table = "todo_list";
+
+try {
+  $db = new PDO("mysql:host=localhost;dbname=$database", $user, $password);
+  echo "<h2>TODO</h2><ol>"; 
+  foreach($db->query("SELECT content FROM $table") as $row) {
+    echo "<li>" . $row['content'] . "</li>";
+  }
+  echo "</ol>";
+} catch (PDOException $e) {
+    print "Error!: " . $e->getMessage() . "<br/>";
+    die();
+}
+```
+
+5. http://malik.hftm/todo_list.php to check if the table is shown
+
+6. ?????
+
+7. profit
+
+User management
+===============
+
+
+
+
+
+
