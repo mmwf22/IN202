@@ -381,6 +381,21 @@ User management
 
 
 
+Package management
+==================
+
+
+add baseurl to /etc/apt/sources.list
+
+>sudo vim /etc/apt/sources.list
+
+https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse
+
+![apt sources.list](pics/apt_sources_list.PNG)
+
+download pgp key and convert the key to gpg key and 
+
+>curl -fsSL https://www.mongodb.org/static/pgp/server-5.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongod.5.0.gpg
 
 
 
