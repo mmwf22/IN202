@@ -754,8 +754,31 @@ https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse
 
 > wget -qO- https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
 
-## install mongod
+## install mongodb
 
->sudp apt install mongod
+>sudo apt install mongodb-org
 
+I got the following error:
+
+```
+.....
+The following packages have unmet dependencies:
+ mongodb-org-mongos : Depends: libssl1.1 (>= 1.1.1) but it is not installable
+ mongodb-org-server : Depends: libssl1.1 (>= 1.1.1) but it is not installable
+ mongodb-org-shell : Depends: libssl1.1 (>= 1.1.1) but it is not installable
+E: Unable to correct problems, you have held broken packages.
+```
+
+So I tried to install the dependencie manually
+
+```
+malik@hv-ubnt:~$ wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+malik@hv-ubnt:~$ sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+```
+
+then I tried again
+
+>sudo apt install mongodb-org
+
+and the installation was successfull
 
