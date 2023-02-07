@@ -424,9 +424,11 @@ Firma:x:1006:
 - Beate, G: Technik, Verkauf, HR, Projekt
 ```
 
+with useradd I'm also defining the main group (-g) as well as additionl groups (-G) for each user as well as creating a home-directory (-m) and choosing which shell each user uses (-s)
+
 *input*
 ```
-malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik -m -s bin/bash Hans  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik -m -s /bin/bash Hans  
 malik@hv-ubnt:~$  sudo useradd -g Firma -G Verkauf -m -s /bin/bash Peter    
 malik@hv-ubnt:~$  sudo useradd -g Firma -G Verkauf -m -s /bin/bash Alfred  
 malik@hv-ubnt:~$  sudo useradd -g Firma -G HR,Projekt -m -s /bin/bash Georg  
@@ -504,7 +506,7 @@ malik@hv-ubnt:~$
 
 changing the permissions for the others group so only members of the folder-group can access the folder
 
-for folder "technik" I'm using SGID sticky bit so all new files and folders inherit the permissions of the group
+for folder "technik" I'm using SGID so all new files and folders inherit the permissions of the group
 
 ```
 malik@hv-ubnt:~$ sudo chmod 2770 /opt/hftm/technik  
@@ -516,7 +518,7 @@ malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/firma
 
 for the folder "temp" i will use a sticky bit so only owners of a file can delete it
 
->malik@hv-ubnt:~$ sudo chmod 1770 /opt/hftm/temp
+>malik@hv-ubnt:~$ sudo chmod +t /opt/hftm/temp
 
 ### change group of folders
 
@@ -526,6 +528,7 @@ malik@hv-ubnt:~$ sudo chgrp Technik /opt/hftm/technik
 malik@hv-ubnt:~$ sudo chgrp Verkauf /opt/hftm/verkauf  
 malik@hv-ubnt:~$ sudo chgrp HR /opt/hftm/hr  
 malik@hv-ubnt:~$ sudo chgrp Projekt /opt/hftm/projekt  
+malik@hv-ubnt:~$ sudo chgrp Firma /opt/hftm/temp
 ```
 
 check group
@@ -612,18 +615,128 @@ Maximum number of days between password change          : 99999
 Number of days of warning before password expires       : 7  
 ```
 
-### Markus r on verkauf
+### Markus read on verkauf
 
-here I will use setfacl to change the permissions without changing the owner of the folder
+here I will use setfacl to change the permissions without changing the owner of the folder. I also need to give Markus exectue permission so he can enter the folder
 
 ```
-malik@hv-ubnt:~$ sudo setfacl -m u:Markus:r /opt/hftm/verkauf  
+malik@hv-ubnt:~$ sudo setfacl -m u:Markus:rx /opt/hftm/verkauf  
+```
+
+check if permission is granted
+
+```
+malik@hv-ubnt:~$ sudo getfacl /opt/hftm/verkauf
+getfacl: Removing leading '/' from absolute path names
+# file: opt/hftm/verkauf
+# owner: root
+# group: Verkauf
+user::rwx
+user:Markus:r-x
+group::rwx
+mask::rwx
+other::---
 ```
 
 ## testing
 
+### seeing if I only have access to the specified folders for each user
+
+```
+malik@hv-ubnt:~$ su Hans
+Password:
+Hans@hv-ubnt:~$ cd /opt/hftm
+Hans@hv-ubnt:/opt/hftm ls
+firma  hr  lost+found  projekt  technik  temp  verkauf
+Hans@hv-ubnt:/opt/hftm$ cd hr/
+bash: cd: hr/: Permission denied
+Hans@hv-ubnt:/opt/hftm$ cd firma
+Hans@hv-ubnt:/opt/hftm/firma$ cd ../projekt/
+bash: cd: ../projekt/: Permission denied
+Hans@hv-ubnt:/opt/hftm/firma$ cd ../technik
+Hans@hv-ubnt:/opt/hftm/technik$ cd ../verkauf
+bash: cd: ../verkauf: Permission denied
+Hans@hv-ubnt:/opt/hftm/technik$ cd ../temp
+Hans@hv-ubnt:/opt/hftm/temp$
+```
+
+Hans only has access to the his permitted folders
+
+### temp folder functionality
+
+create 3 files with Hans
+
+```
+Hans@hv-ubnt:/opt/hftm/temp$ touch hans1 hans2 hans3
+Hans@hv-ubnt:/opt/hftm/temp$ ls
+hans1  hans2  hans3
+```
+
+delete one file with Hans
+
+```
+Hans@hv-ubnt:/opt/hftm/temp$ ls
+hans1  hans2  hans3
+Hans@hv-ubnt:/opt/hftm/temp$ rm hans2
+Hans@hv-ubnt:/opt/hftm/temp$ ls
+hans1  hans3
+```
+
+try to delete a file created by Hans with Markus
+
+```
+Markus@hv-ubnt:/opt/hftm/temp$ ls
+hans1  hans3
+Markus@hv-ubnt:/opt/hftm/temp$ rm hans1
+rm: remove write-protected regular empty file 'hans1'? yes
+rm: cannot remove 'hans1': Operation not permitted
+```
+
+### see if Markus can read folder 'verkauf'
+
+For this I created a file with Peter
+
+```
+Peter@hv-ubnt:/opt/hftm$ cd verkauf/
+Peter@hv-ubnt:/opt/hftm/verkauf$ touch testfuermarkus
+Peter@hv-ubnt:/opt/hftm/verkauf$ vim testfuermarkus
+```
+
+now I try to read the file with Markus then I see if I can delete it
+
+```
+Markus@hv-ubnt:/opt/hftm/verkauf$ cat testfuermarkus
+funktioniert es?
+
+ja es funktioniert!
+Markus@hv-ubnt:/opt/hftm/verkauf$ rm testfuermarkus
+rm: remove write-protected regular file 'testfuermarkus'? yes
+rm: cannot remove 'testfuermarkus': Permission denied
+```
+
+### check if folder "technik" SGID is set correctly
+
+For this I will create folders and files and check the permissions
 
 
+```
+Hans@hv-ubnt:/opt/hftm/technik$ mkdir test1
+Hans@hv-ubnt:/opt/hftm/technik$ touch testfile1
+Hans@hv-ubnt:/opt/hftm/technik$ cd test1/
+Hans@hv-ubnt:/opt/hftm/technik/test1$ mkdir test2
+Hans@hv-ubnt:/opt/hftm/technik/test1$ touch testfile2
+----------------------------------------------------------
+Hans@hv-ubnt:/opt/hftm/technik$ ls -l
+total 4
+drwxr-sr-x 3 Hans Technik 4096 Feb  7 14:59 test1
+-rw-r--r-- 1 Hans Technik    0 Feb  7 14:59 testfile1
+----------------------------------------------------------
+Hans@hv-ubnt:/opt/hftm/technik$ cd test1/
+Hans@hv-ubnt:/opt/hftm/technik/test1$ ls -l
+total 4
+drwxr-sr-x 2 Hans Technik 4096 Feb  7 14:59 test2
+-rw-r--r-- 1 Hans Technik    0 Feb  7 14:59 testfile2
+```
 
 Package management
 ==================
