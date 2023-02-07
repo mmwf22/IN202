@@ -541,7 +541,7 @@ drwxr-xr-x 2 root HR       4096 Feb  6 18:48 hr
 drwx------ 2 root root    16384 Jan 28 08:11 lost+found
 drwxr-xr-x 5 root Projekt  4096 Feb  6 18:51 projekt
 drwxr-xr-x 2 root Technik  4096 Feb  6 18:48 technik
-drwxr-xr-x 2 root root     4096 Feb  6 18:48 temp
+drwxr-xr-x 2 root Firma     4096 Feb  6 18:48 temp
 drwxr-xr-x 2 root Verkauf  4096 Feb  6 18:48 verkauf
 ```
 
