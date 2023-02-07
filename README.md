@@ -391,20 +391,25 @@ User management
 - Firma
 ```
 *input*
->malik@hv-ubnt:~$ sudo groupadd Technik  
+
+```
+malik@hv-ubnt:~$ sudo groupadd Technik  
 malik@hv-ubnt:~$ sudo groupadd Verkauf  
 malik@hv-ubnt:~$ sudo groupadd HR  
 malik@hv-ubnt:~$ sudo groupadd Projekt  
 malik@hv-ubnt:~$ sudo groupadd Firma
+```
 
 check if groups got created
 
->malik@hv-ubnt:~$ sudo getent group | grep 'Technik\|Verkauf\|HR\|Projekt\|Firma'  
+```
+malik@hv-ubnt:~$ sudo getent group | grep 'Technik\|Verkauf\|HR\|Projekt\|Firma'  
 Technik:x:1002:  
 Verkauf:x:1003:  
 HR:x:1004:  
 Projekt:x:1005:  
 Firma:x:1006:  
+```
 
 ## 2. create users
 
@@ -420,16 +425,16 @@ Firma:x:1006:
 ```
 
 *input*
-
->malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik -m -s bin/bash Hans  
-malik@hv-ubnt:~$  sudo useradd -g Firma -G Verkauf -m -s bin/bash Peter    
-malik@hv-ubnt:~$  sudo useradd -g Firma -G Verkauf -m -s bin/bash Alfred  
-malik@hv-ubnt:~$  sudo useradd -g Firma -G HR,Projekt -m -s bin/bash Georg  
-malik@hv-ubnt:~$  sudo useradd -g Firma -G HR -m -s bin/bash Markus     
-malik@hv-ubnt:~$  sudo useradd -g Firma -G Projekt -m -s bin/bash Albert   
-malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik,Projekt -m -s bin/bash Christine  
-malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik,Verkauf,HR,Projekt -m -s bin/bash Beate  
-
+```
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik -m -s bin/bash Hans  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Verkauf -m -s /bin/bash Peter    
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Verkauf -m -s /bin/bash Alfred  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G HR,Projekt -m -s /bin/bash Georg  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G HR -m -s /bin/bash Markus     
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Projekt -m -s /bin/bash Albert   
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik,Projekt -m -s /bin/bash Christine  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik,Verkauf,HR,Projekt -m -s /bin/bash Beate  
+```
 second step is to create passwords {USERNAME123}
 
 ```
@@ -458,8 +463,10 @@ Beate : Firma Technik Verkauf HR Projekt
 
 ![directory tree](pics/directory_tree.png)
 
->malik@hv-ubnt:~$ sudo mkdir -p /opt/hftm/{firma,hr,projekt,technik,temp,verkauf}  
+```
+malik@hv-ubnt:~$ sudo mkdir -p /opt/hftm/{firma,hr,projekt,technik,temp,verkauf}  
 malik@hv-ubnt:~$  sudo mkdir -p /opt/hftm/projekt/{diverses,dokumentation,vertrag}
+```
 
 check tree
 
@@ -499,12 +506,13 @@ changing the permissions for the others group so only members of the folder-grou
 
 for folder "technik" I'm using SGID sticky bit so all new files and folders inherit the permissions of the group
 
->malik@hv-ubnt:~$ sudo chmod 2770 /opt/hftm/technik  
-
->malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/verkauf  
+```
+malik@hv-ubnt:~$ sudo chmod 2770 /opt/hftm/technik  
+malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/verkauf  
 malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/hr  
 malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/projekt  
 malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/firma
+```
 
 for the folder "temp" i will use a sticky bit so only owners of a file can delete it
 
@@ -512,11 +520,13 @@ for the folder "temp" i will use a sticky bit so only owners of a file can delet
 
 ### change group of folders
 
->malik@hv-ubnt:~$ sudo chgrp Firma /opt/hftm/firma  
+```
+malik@hv-ubnt:~$ sudo chgrp Firma /opt/hftm/firma  
 malik@hv-ubnt:~$ sudo chgrp Technik /opt/hftm/technik  
 malik@hv-ubnt:~$ sudo chgrp Verkauf /opt/hftm/verkauf  
 malik@hv-ubnt:~$ sudo chgrp HR /opt/hftm/hr  
 malik@hv-ubnt:~$ sudo chgrp Projekt /opt/hftm/projekt  
+```
 
 check group
 
@@ -585,11 +595,14 @@ If none of the options are selected, chage operates in an interactive fashion, p
 
 **input**
 
->malik@hv-ubnt:~$ sudo chage -E 2023-02-08 -I 5 Hans
+```
+malik@hv-ubnt:~$ sudo chage -E 2023-02-08 -I 5 Hans
+```
 
 check status:
 
->malik@hv-ubnt:~$ sudo chage -l Hans  
+```
+malik@hv-ubnt:~$ sudo chage -l Hans  
 Last password change                                    : Feb 06, 2023  
 Password expires                                        : never  
 Password inactive                                       : never  
@@ -597,13 +610,15 @@ Account expires                                         : Feb 08, 2023
 Minimum number of days between password change          : 0  
 Maximum number of days between password change          : 99999  
 Number of days of warning before password expires       : 7  
+```
 
 ### Markus r on verkauf
 
 here I will use setfacl to change the permissions without changing the owner of the folder
 
->malik@hv-ubnt:~$ sudo setfacl -m u:Markus:r /opt/hftm/verkauf  
-
+```
+malik@hv-ubnt:~$ sudo setfacl -m u:Markus:r /opt/hftm/verkauf  
+```
 
 ## testing
 
