@@ -379,13 +379,242 @@ try {
 User management
 ===============
 
+## 1. create groups
+
+**groups:**
+
+```
+- Technik
+- Verkauf
+- HR
+- Projekt
+- Firma
+```
+*input*
+>malik@hv-ubnt:~$ sudo groupadd Technik  
+malik@hv-ubnt:~$ sudo groupadd Verkauf  
+malik@hv-ubnt:~$ sudo groupadd HR  
+malik@hv-ubnt:~$ sudo groupadd Projekt  
+malik@hv-ubnt:~$ sudo groupadd Firma
+
+check if groups got created
+
+>malik@hv-ubnt:~$ sudo getent group | grep 'Technik\|Verkauf\|HR\|Projekt\|Firma'  
+Technik:x:1002:  
+Verkauf:x:1003:  
+HR:x:1004:  
+Projekt:x:1005:  
+Firma:x:1006:  
+
+## 2. create users
+
+```
+- Hans, G: Technik
+- Peter,  G: Verkauf
+- Alfred, G: Verkauf
+- Georg , G: HR, Projekt
+- Markus, G: HR
+- Albert, G: Projekt
+- Christne, G: Technik, Projekt
+- Beate, G: Technik, Verkauf, HR, Projekt
+```
+
+*input*
+
+>malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik -m -s bin/bash Hans  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Verkauf -m -s bin/bash Peter    
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Verkauf -m -s bin/bash Alfred  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G HR,Projekt -m -s bin/bash Georg  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G HR -m -s bin/bash Markus     
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Projekt -m -s bin/bash Albert   
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik,Projekt -m -s bin/bash Christine  
+malik@hv-ubnt:~$  sudo useradd -g Firma -G Technik,Verkauf,HR,Projekt -m -s bin/bash Beate  
+
+second step is to create passwords {USERNAME123}
+
+```
+malik@hv-ubnt:~$ sudo passwd Hans
+New password:
+Retype new password:
+passwd: password updated successfully
+```
+repeated for each user
+
+
+
+check if all users got created and list their groups
+
+>malik@hv-ubnt:~$ sudo groups Hans Peter Alfred Georg Markus Albert Christine Beate  
+Hans : Firma Technik  
+Peter : Firma Verkauf  
+Alfred : Firma Verkauf  
+Georg : Firma HR Projekt  
+Markus : Firma HR  
+Albert : Firma Projekt  
+Christine : Firma Technik Projekt  
+Beate : Firma Technik Verkauf HR Projekt  
+
+## 3. create directory tree
+
+![directory tree](pics/directory_tree.png)
+
+>malik@hv-ubnt:~$ sudo mkdir -p /opt/hftm/{firma,hr,projekt,technik,temp,verkauf}  
+malik@hv-ubnt:~$  sudo mkdir -p /opt/hftm/projekt/{diverses,dokumentation,vertrag}
+
+check tree
+
+```
+malik@hv-ubnt:~$ sudo ls /opt/hftm/ -l
+total 40
+drwxr-xr-x 2 root root  4096 Feb  6 18:48 firma
+drwxr-xr-x 2 root root  4096 Feb  6 18:48 hr
+drwx------ 2 root root 16384 Jan 28 08:11 lost+found
+drwxr-xr-x 5 root root  4096 Feb  6 18:51 projekt
+drwxr-xr-x 2 root root  4096 Feb  6 18:48 technik
+drwxr-xr-x 2 root root  4096 Feb  6 18:48 temp
+drwxr-xr-x 2 root root  4096 Feb  6 18:48 verkauf
+malik@hv-ubnt:~$ sudo ls /opt/hftm/projekt -l
+total 12
+drwxr-xr-x 2 root root 4096 Feb  6 18:51 diverses
+drwxr-xr-x 2 root root 4096 Feb  6 18:51 dokumentation
+drwxr-xr-x 2 root root 4096 Feb  6 18:51 vertrag
+malik@hv-ubnt:~$
+```
+
+## 4. manage permissions
+
+```
+- least privileges
+- all folders user root --> owner
+- group with same name as folder --> owner and rwx
+- Hans --> account locked 5 days after password expires
+- Markus --> r on verkauf
+- all --> create files in temp, only delete own files
+- Technik inhert to all new folders and files in folder technik (SGID)
+```
+
+### least privileges
+
+changing the permissions for the others group so only members of the folder-group can access the folder
+
+for folder "technik" I'm using SGID sticky bit so all new files and folders inherit the permissions of the group
+
+>malik@hv-ubnt:~$ sudo chmod 2770 /opt/hftm/technik  
+
+>malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/verkauf  
+malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/hr  
+malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/projekt  
+malik@hv-ubnt:~$ sudo chmod 0770 /opt/hftm/firma
+
+for the folder "temp" i will use a sticky bit so only owners of a file can delete it
+
+>malik@hv-ubnt:~$ sudo chmod 1770 /opt/hftm/temp
+
+### change group of folders
+
+>malik@hv-ubnt:~$ sudo chgrp Firma /opt/hftm/firma  
+malik@hv-ubnt:~$ sudo chgrp Technik /opt/hftm/technik  
+malik@hv-ubnt:~$ sudo chgrp Verkauf /opt/hftm/verkauf  
+malik@hv-ubnt:~$ sudo chgrp HR /opt/hftm/hr  
+malik@hv-ubnt:~$ sudo chgrp Projekt /opt/hftm/projekt  
+
+check group
+
+```
+malik@hv-ubnt:~$ sudo ls /opt/hftm/ -l
+total 40
+drwxr-xr-x 2 root Firma    4096 Feb  6 18:48 firma
+drwxr-xr-x 2 root HR       4096 Feb  6 18:48 hr
+drwx------ 2 root root    16384 Jan 28 08:11 lost+found
+drwxr-xr-x 5 root Projekt  4096 Feb  6 18:51 projekt
+drwxr-xr-x 2 root Technik  4096 Feb  6 18:48 technik
+drwxr-xr-x 2 root root     4096 Feb  6 18:48 temp
+drwxr-xr-x 2 root Verkauf  4096 Feb  6 18:48 verkauf
+```
+
+### lock account from Hans 5 days after password expires
+
+for password expiration information use chage
+
+synopsis:
+>**chage** [options] [LOGIN]
+
+flags:
+
+```
+-d, --lastday LAST_DAY
+
+Set the number of days since January 1st, 1970 when the password was last changed. The date may also be expressed in the format YYYY-MM-DD (or the format more commonly used in your area). 
+
+-E, --expiredate EXPIRE_DATE
+
+  Set the date or number of days since January 1, 1970 on which the user's account will no longer be accessible. The date may also be expressed in the format YYYY-MM-DD (or the format more commonly used in your area). A user whose account is locked must contact the system administrator before being able to use the system again.
+
+  Passing the number -1 as the EXPIRE_DATE will remove an account expiration date. 
+
+-h, --help
+
+  Display help message and exit. 
+
+-I, --inactive INACTIVE
+
+  Set the number of days of inactivity after a password has expired before the account is locked. The INACTIVE option is the number of days of inactivity. A user whose account is locked must contact the system administrator before being able to use the system again.
+
+  Passing the number -1 as the INACTIVE will remove an account's inactivity. 
+
+-l, --list
+
+  Show account aging information.
+
+-m, --mindays MIN_DAYS
+
+  Set the minimum number of days between password changes to MIN_DAYS. A value of zero for this field indicates that the user may change his/her password at any time.
+
+-M, --maxdays MAX_DAYS
+
+  Set the maximum number of days during which a password is valid. When MAX_DAYS plus LAST_DAY is less than the current day, the user will be required to change his/her password before being able to use his/her account. This occurrence can be planned for in advance by use of the -W option, which provides the user with advance warning.
+
+  Passing the number -1 as MAX_DAYS will remove checking a password's validity. 
+
+-W, --warndays WARN_DAYS
+
+  Set the number of days of warning before a password change is required. The WARN_DAYS option is the number of days prior to the password expiring that a user will be warned his/her password is about to expire. 
+
+If none of the options are selected, chage operates in an interactive fashion, prompting the user with the current values for all of the fields. Enter the new value to change the field, or leave the line blank to use the current value. The current value is displayed between a pair of [ ] marks. 
+```
+
+**input**
+
+>malik@hv-ubnt:~$ sudo chage -E 2023-02-08 -I 5 Hans
+
+check status:
+
+>malik@hv-ubnt:~$ sudo chage -l Hans  
+Last password change                                    : Feb 06, 2023  
+Password expires                                        : never  
+Password inactive                                       : never  
+Account expires                                         : Feb 08, 2023  
+Minimum number of days between password change          : 0  
+Maximum number of days between password change          : 99999  
+Number of days of warning before password expires       : 7  
+
+### Markus r on verkauf
+
+here I will use setfacl to change the permissions without changing the owner of the folder
+
+>malik@hv-ubnt:~$ sudo setfacl -m u:Markus:r /opt/hftm/verkauf  
+
+
+## testing
+
+
 
 
 Package management
 ==================
 
 
-add baseurl to /etc/apt/sources.list
+## add baseurl to /etc/apt/sources.list
 
 >sudo vim /etc/apt/sources.list
 
@@ -393,9 +622,12 @@ https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse
 
 ![apt sources.list](pics/apt_sources_list.PNG)
 
-download pgp key and convert the key to gpg key and 
+## add gpg key
 
->curl -fsSL https://www.mongodb.org/static/pgp/server-5.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongod.5.0.gpg
+> wget -qO- https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
 
+## install mongod
+
+>sudp apt install mongod
 
 
