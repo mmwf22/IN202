@@ -702,7 +702,7 @@ Peter@hv-ubnt:/opt/hftm/verkauf$ touch testfuermarkus
 Peter@hv-ubnt:/opt/hftm/verkauf$ vim testfuermarkus
 ```
 
-now I try to read the file with Markus then I see if I can delete it
+now I try to read the file with Markus after that I try to delete the file
 
 ```
 Markus@hv-ubnt:/opt/hftm/verkauf$ cat testfuermarkus
