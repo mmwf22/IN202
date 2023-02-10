@@ -782,3 +782,58 @@ then I tried again
 
 and the installation was successfull
 
+## starting the service manually
+
+```
+sudo systemctl start mongod
+```
+
+check if the service is runing
+
+```
+malik@hv-ubnt:~$ sudo systemctl status mongod
+● mongod.service - MongoDB Database Server
+     Loaded: loaded (/lib/systemd/system/mongod.service; disabled; vendor preset: enabled)
+     Active: active (running) since Fri 2023-02-10 10:57:19 UTC; 4min 20s ago
+       Docs: https://docs.mongodb.org/manual
+   Main PID: 1544 (mongod)
+     Memory: 220.4M
+        CPU: 971ms
+     CGroup: /system.slice/mongod.service
+             └─1544 /usr/bin/mongod --config /etc/mongod.conf
+
+Feb 10 10:57:19 hv-ubnt systemd[1]: Started MongoDB Database Server.
+```
+
+**PID: 1544 (mongod)**
+
+## make mongod persistent
+
+```
+malik@hv-ubnt:~$ sudo systemctl enable mongod
+Created symlink /etc/systemd/system/multi-user.target.wants/mongod.service → /lib/systemd/system/mongod.service.
+```
+
+after a reboot the service was running. 
+
+## see how many DEP-packages an APT repository contains
+
+
+
+## snap vs apt
+
+the main difference is that snaps contain an app and all dependencies it needs within the package, whereas for example an apt package
+can be an app and then it needs other apt packages as dependencies for that app. snap installs the app sandboxed.
+
+### use-case
+
+snap is well fit for delivering complete software packages.
+Installing anything like VLC-Player, a webbrowser etc...
+
+```
+sudo snap install firefox
+```
+
+
+
+
