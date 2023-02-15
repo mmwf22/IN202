@@ -822,18 +822,14 @@ after a reboot the service was running.
 
 ## snap vs apt
 
-the main difference is that snaps contain an app and all dependencies it needs within the package, whereas for example an apt package
+te main difference is that snaps contain an app ad all dependencies it needs within the package, whereas for example an apt package
 can be an app and then it needs other apt packages as dependencies for that app. snap installs the app sandboxed.
 
 ### use-case
 
 snap is well fit for delivering complete software packages.
-Installing anything like VLC-Player, a webbrowser etc...
+Installing anything. like VLC-Player, a webbrowser etc...
 
 ```
 sudo snap install firefox
 ```
-
-
-
-
