@@ -1,6 +1,7 @@
-name;group;sudo
-Klaus;Microsoft;1
-Mehmet; Microsoft;1
-Bjoern; Microsoft;0
-Petra; Microsoft;1
-Jules; Apple;0
+name,group,sudo
+Klaus,Microsoft,Ja
+Mehmet,Microsoft,Ja
+Bjoern,Microsoft,Nein
+Petra,Microsoft,Ja
+Jules,Apple,Nein
+Kevin,Yahoo,Ja

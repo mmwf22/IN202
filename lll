@@ -1,0 +1,32 @@
+
+## adding secondary eth interface
+
+
+```
+ifconfig <secondary_interface_name> <virtual_ip_address> netmask <netmask>
+```
+
+**input**
+
+```
+sudo ifconfig eth0:0 192.168.22.88 netmask 255.255.255.0
+```
+
+```
+malik@hv-ubnt:~$ ip address | grep eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    inet 192.168.22.132/24 metric 100 brd 192.168.22.255 scope global dynamic eth0
+    inet 192.168.22.88/24 brd 192.168.22.255 scope global secondary eth0:0
+```
+
+### removing secondary interface
+
+```
+ifconfig <secondary_interface_name> del <virtual_ip_address>
+```
+
+**input**
+
+```
+sudo ifconfig eth0:0 del 192.168.22.88
+```
