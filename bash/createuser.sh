@@ -18,10 +18,16 @@ for i in "${!A_USERNAME[@]}"; do
   if [ "${A_SUDO[i]}" = Ja ]; then
      usermod -aG sudo  "${A_USERNAME[i]}"
   fi
+  echo "Please enter your password for ${A_USERNAME[i]}: "
+  read -rs password
+  echo "${password}"
+  
   echo "${i}"
   echo "${A_GROUP[i]}"
   echo "${A_USERNAME[i]}"
 done
 
 userdel -r {}
+userdel -r name
+groupdel group
 groupdel {}
