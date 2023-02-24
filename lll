@@ -30,3 +30,18 @@ ifconfig <secondary_interface_name> del <virtual_ip_address>
 ```
 sudo ifconfig eth0:0 del 192.168.22.88
 ```
+
+
+
+
+
+
+
+
+  if [ "${A_GROUP[i]}" = Microsoft ] ; then
+    if getent group Microsoft; then
+      useradd -g Microsoft -m -s /bin/bash "${A_USERNAME[i]}"
+    else
+      groupadd Microsoft
+      useradd -g Microsoft -m -s /bin/bash "${A_USERNAME[i]}"
+    fi
