@@ -831,7 +831,19 @@ after a reboot the service was running.
 
 ## see how many DEP-packages an APT repository contains
 
+Herausfinden, wie viele Pakete sich in dem neu hinzugefügten Repository befinden:
 
+find name of repo:
+
+```
+ls /var/lib/apt/lists/*_Packages
+```
+
+list all packages:
+
+```
+grep *Package /var/lib/apt/lists/repo.mongodb.org_apt_ubuntu_dists_focal_mongodb-org_5.0_multiverse_binary-amd64_Packages | awk '{print $2}' | sort -u
+```
 
 ## snap vs apt
 
