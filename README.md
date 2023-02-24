@@ -1,6 +1,15 @@
 **Workbook IN202**
 ==================
 
+## Index
+
+- [SSH Authentication config](#ssh-authentication-config)
+- [Disks and Partitions](#disks-and-partitions)
+- [LEMP](#lemp)
+- [User management](#user-management)
+- [Package management](#package-management)
+- [Bash script](#bash-script)
+
 SSH Authentication config
 ===========================
 
@@ -74,6 +83,7 @@ user@192.168.22.139: Permission denied (publickey).
 </pre>
 
 not able to connect, pubkeyAuthentication is working
+
 
 
 
@@ -205,6 +215,7 @@ sudo umount -a
 sudo mount -a
 sudo mount -l
 ```
+
 LEMP
 ====
 
@@ -375,6 +386,7 @@ try {
 6. ?????
 
 7. profit
+
 
 User management
 ===============
@@ -738,6 +750,7 @@ drwxr-sr-x 2 Hans Technik 4096 Feb  7 14:59 test2
 -rw-r--r-- 1 Hans Technik    0 Feb  7 14:59 testfile2
 ```
 
+
 Package management
 ==================
 
@@ -833,6 +846,8 @@ Installing anything. like VLC-Player, a webbrowser etc...
 ```
 sudo snap install firefox
 ```
+
+
 
 Bash Script
 ============
