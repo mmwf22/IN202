@@ -833,3 +833,37 @@ Installing anything. like VLC-Player, a webbrowser etc...
 ```
 sudo snap install firefox
 ```
+
+Bash Script
+============
+
+I created three bash scripts. The main script iterates over a cvs file and does the follwoing:
+
+- creates group for user if it is not already in existence
+- creates user adds to group etc...
+- adds user to sudo if the user is marked as "Ja" in the sudo row of users.csv
+- prompts user to create password for each user
+- deletes unwanted groups and users that got created from the array in the script
+
+
+## [createuser.sh](bash/createuser.sh)
+
+
+![createuser.sh](pics/creatusersh.PNG)
+
+ ## [deleteusers.sh](bash/deleteusers.sh)
+
+ if i want to revert changes
+
+![deleteusers.sh](pics/deleteusersh.PNG)
+
+## [alternative.sh](bash/alternative.sh)
+
+this is an alternative script thats works without .csv file
+
+![alternative.sh](pics/alternativesh.png)
+
+
+## output from main script
+
+![Output createuser.sh](pics/output_createusersh.PNG)
